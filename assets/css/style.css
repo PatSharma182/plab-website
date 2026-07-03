@@ -281,17 +281,14 @@ SECTION 05 SERVICES
 
 
 /* =========================
-SECTION 04 GOOGLE REVIEWS
+GOOGLE REVIEWS MINI MARQUEE
 ========================= */
 
 .reviews-section {
-  position: relative;
-  overflow: hidden;
-  background:
-    radial-gradient(circle at 80% 15%, rgba(254,99,0,.13), transparent 30%),
-    linear-gradient(180deg, #050505 0%, #000 100%);
-  padding: 140px 24px;
+  background: #000;
   color: #fff;
+  padding: 90px 24px;
+  overflow: hidden;
 }
 
 .reviews-container {
@@ -299,94 +296,141 @@ SECTION 04 GOOGLE REVIEWS
   margin: 0 auto;
 }
 
+.reviews-header {
+  display: grid;
+  grid-template-columns: 1fr 0.8fr;
+  gap: 60px;
+  align-items: end;
+  margin-bottom: 54px;
+}
+
 .reviews-title {
-  max-width: 1040px;
+  max-width: 780px;
 }
 
 .reviews-intro {
-  margin-top: 34px;
-  max-width: 760px;
-  font-size: 22px;
-  line-height: 1.6;
-  color: rgba(255,255,255,.72);
+  font-size: 20px;
+  line-height: 1.55;
+  color: rgba(255,255,255,.68);
+  max-width: 520px;
 }
 
-.reviews-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+.reviews-marquee {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.reviews-marquee::before,
+.reviews-marquee::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 120px;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.reviews-marquee::before {
+  left: 0;
+  background: linear-gradient(to right, #000, transparent);
+}
+
+.reviews-marquee::after {
+  right: 0;
+  background: linear-gradient(to left, #000, transparent);
+}
+
+.reviews-track {
+  display: flex;
   gap: 18px;
-  margin-top: 74px;
+  width: max-content;
+  animation: reviewsScroll 38s linear infinite;
 }
 
-.review-card {
-  min-height: 340px;
+.reviews-track:hover {
+  animation-play-state: paused;
+}
+
+.review-mini-card {
+  width: 360px;
+  min-height: 260px;
+  flex: 0 0 auto;
   border: 1px solid rgba(255,255,255,.10);
   background: rgba(255,255,255,.045);
-  border-radius: 28px;
-  padding: 34px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: transform .35s ease, border-color .35s ease, background .35s ease;
+  border-radius: 24px;
+  padding: 26px;
+  transition: transform .3s ease, border-color .3s ease, background .3s ease;
 }
 
-.review-card:hover {
+.review-mini-card:hover {
   transform: translateY(-6px);
   border-color: rgba(254,99,0,.45);
   background: rgba(255,255,255,.07);
 }
 
-.stars {
+.review-mini-card img {
+  width: 54px;
+  height: 54px;
+  border-radius: 999px;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,.18);
+  margin-bottom: 18px;
+}
+
+.review-mini-card .stars {
   color: #FE6300;
-  font-size: 20px;
-  letter-spacing: .08em;
-  margin-bottom: 28px;
+  font-size: 16px;
+  letter-spacing: .06em;
+  margin-bottom: 18px;
 }
 
-.review-card p {
-  font-size: 20px;
-  line-height: 1.55;
-  color: rgba(255,255,255,.82);
-  margin: 0;
+.review-mini-card p {
+  font-size: 16px;
+  line-height: 1.5;
+  color: rgba(255,255,255,.78);
+  margin-bottom: 24px;
 }
 
-.review-author {
-  margin-top: 32px;
-  font-size: 15px;
+.review-mini-card h3 {
+  font-size: 16px;
   font-weight: 900;
-  color: #fff;
+  margin-bottom: 5px;
 }
 
-.featured-review {
-  background:
-    linear-gradient(135deg, rgba(254,99,0,.22), rgba(255,255,255,.045));
-  border-color: rgba(254,99,0,.42);
+.review-mini-card span {
+  display: block;
+  color: #FE6300;
+  font-size: 13px;
+  font-weight: 800;
 }
 
-@media (max-width: 1000px) {
-  .reviews-grid {
-    grid-template-columns: 1fr;
-    gap: 18px;
-    margin-top: 54px;
+@keyframes reviewsScroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
   }
 }
 
 @media (max-width: 900px) {
   .reviews-section {
-    padding: 100px 22px;
+    padding: 80px 22px;
+  }
+
+  .reviews-header {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    margin-bottom: 42px;
   }
 
   .reviews-intro {
     font-size: 18px;
   }
 
-  .review-card {
-    min-height: auto;
-    padding: 28px;
-    border-radius: 22px;
-  }
-
-  .review-card p {
-    font-size: 18px;
+  .review-mini-card {
+    width: 310px;
   }
 }
