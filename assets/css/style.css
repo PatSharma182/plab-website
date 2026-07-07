@@ -2237,8 +2237,11 @@ SECTION 07 SELECTED WORK
 .video-modal-bg {
   position: absolute;
   inset: 0;
+  border: 0;
+  padding: 0;
   background: rgba(0,0,0,.88);
   backdrop-filter: blur(10px);
+  cursor: pointer;
 }
 
 .video-frame {
@@ -2248,12 +2251,17 @@ SECTION 07 SELECTED WORK
   aspect-ratio: 16/9;
   border-radius: 24px;
   overflow: hidden;
+  border: 1px solid rgba(254, 99, 0, .24);
   box-shadow: 0 40px 120px rgba(0,0,0,.7);
 }
 
-.video-frame iframe {
+.video-frame iframe,
+.video-frame video {
+  display: block;
   width: 100%;
   height: 100%;
+  border: 0;
+  object-fit: cover;
 }
 
 .video-close {
@@ -3533,16 +3541,12 @@ body.service-modal-open {
 
 .portfolio-grid {
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  grid-auto-rows: 72px;
-  grid-auto-flow: dense;
-  gap: 20px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
 }
 
 .portfolio-preview-card {
   position: relative;
-  grid-column: span 4;
-  grid-row: span 4;
   overflow: hidden;
   cursor: pointer;
   appearance: none;
@@ -3683,28 +3687,11 @@ body.service-modal-open {
   box-shadow: 0 0 62px rgba(254,99,0,.38);
 }
 
-.portfolio-preview-card h2,
-.portfolio-preview-card h3 {
-  position: relative;
-  z-index: 1;
-  margin: 22px 10px 10px;
-  color: #fff;
-  font-size: 24px;
-  line-height: 1.14;
-  letter-spacing: -.02em;
-}
-
-.portfolio-card-large {
-  grid-column: span 6;
-  grid-row: span 5;
-}
-
-.portfolio-card-wide {
-  grid-column: span 6;
-}
-
+.portfolio-card-large,
+.portfolio-card-wide,
 .portfolio-card-tall {
-  grid-row: span 5;
+  grid-column: auto;
+  grid-row: auto;
 }
 
 .portfolio-cta-section {
@@ -3727,15 +3714,6 @@ body.service-modal-open {
 @media(max-width: 1000px) {
   .portfolio-grid {
     grid-template-columns: repeat(2, 1fr);
-    grid-auto-rows: auto;
-  }
-
-  .portfolio-preview-card,
-  .portfolio-card-large,
-  .portfolio-card-wide,
-  .portfolio-card-tall {
-    grid-column: auto;
-    grid-row: auto;
   }
 }
 
@@ -3767,10 +3745,6 @@ body.service-modal-open {
     transform: translateY(0);
   }
 
-  .portfolio-preview-card h2,
-  .portfolio-preview-card h3 {
-    font-size: 22px;
-  }
 }
 
 /* Brand Story Videos service page */
@@ -7166,7 +7140,7 @@ body.social-example-modal-open {
 .quote-form-card {
   position: relative;
   overflow: visible;
-  min-height: 1812px;
+  min-height: 2184px;
   padding: 14px;
   border-color: rgba(254,99,0,.38);
   border-radius: 34px;
@@ -7187,7 +7161,7 @@ body.social-example-modal-open {
   z-index: 2;
   display: block;
   width: 100%;
-  height: 1784px !important;
+  height: 2156px !important;
   border: 0;
   border-radius: 24px !important;
   background: #050505;
@@ -7221,7 +7195,7 @@ body.social-example-modal-open {
   }
 
   .quote-form-card {
-    min-height: 1812px;
+    min-height: 2184px;
   }
 }
 
@@ -7243,13 +7217,13 @@ body.social-example-modal-open {
   }
 
   .quote-form-card {
-    min-height: 1804px;
+    min-height: 2176px;
     padding: 10px;
     border-radius: 26px;
   }
 
   .quote-form-card iframe {
-    height: 1784px !important;
+    height: 2156px !important;
     border-radius: 20px !important;
   }
 }
