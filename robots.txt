@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+Disallow: /quote-thank-you.html
+Disallow: /marketing-audit-survey.html
+Disallow: /audit-in-progress.html
+Disallow: /marketing-audit-complete.html
+Disallow: /marketing-audit-review.html
+Disallow: /marketing-audit-booking-confirmed.html
+
+Sitemap: https://plabproductions.com/sitemap.xml
