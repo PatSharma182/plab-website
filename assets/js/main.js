@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
         { href: "portfolio.html", text: "Portfolio" },
         { href: "strategy-call.html", text: "Strategy Call" },
         { href: "quote.html", text: "Get Quote" },
-        { href: "marketing-audit-start.html", text: "Free Marketing Audit" }
+        { href: "organic-marketing-audit-start.html", text: "Free Marketing Audit" }
       ].forEach(item => {
         const link = document.createElement("a");
         link.href = item.href;
