@@ -28,14 +28,18 @@ document.addEventListener("DOMContentLoaded", () => {
         { href: "brand-story-videos.html", text: "Brand Story Videos" },
         { href: "social-media-content.html", text: "Social Media Content" },
         { href: "testimonial-videos.html", text: "Testimonial Videos" },
+        { href: "organic-marketing-audit-start.html", html: '<span class="nav-link-accent">FREE</span> Marketing Audit' },
         { href: "portfolio.html", text: "Portfolio" },
         { href: "strategy-call.html", text: "Strategy Call" },
-        { href: "quote.html", text: "Get Quote" },
-        { href: "organic-marketing-audit-start.html", text: "Free Marketing Audit" }
+        { href: "quote.html", text: "Get Quote" }
       ].forEach(item => {
         const link = document.createElement("a");
         link.href = item.href;
-        link.textContent = item.text;
+        if (item.html) {
+          link.innerHTML = item.html;
+        } else {
+          link.textContent = item.text;
+        }
         mobilePanel.appendChild(link);
       });
 

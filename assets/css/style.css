@@ -157,6 +157,14 @@ a { color: inherit; }
     outline: none;
 }
 
+.nav-services-panel a[href="organic-marketing-audit-start.html"] {
+    color: #fff;
+}
+
+.nav-link-accent {
+    color: var(--orange);
+}
+
 .nav-services-divider {
     display: block;
     height: 1px;
@@ -678,10 +686,6 @@ a { color: inherit; }
       rgba(254,99,0,.06);
     color: #fff;
     box-shadow: 0 0 24px rgba(254,99,0,.08);
-  }
-
-  .mobile-menu-panel a[href="organic-marketing-audit-start.html"] {
-    color: var(--orange);
   }
 
   .hero-content,
