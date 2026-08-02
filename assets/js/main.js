@@ -129,6 +129,163 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  const coverageMaps = document.querySelectorAll(".business-coverage-map");
+
+  coverageMaps.forEach(map => {
+    const hotspots = Array.from(map.querySelectorAll(".coverage-hotspot"));
+    const locationElements = Array.from(map.querySelectorAll(".coverage-location"));
+    const routeElements = Array.from(map.querySelectorAll(".coverage-route"));
+
+    const clearActiveCoverage = () => {
+      locationElements.forEach(locationElement => {
+        locationElement.classList.remove("is-coverage-active");
+        locationElement.querySelector(".coverage-point-halo")?.removeAttribute("style");
+        locationElement.querySelector(".coverage-point")?.removeAttribute("style");
+        locationElement.querySelectorAll("text").forEach(label => {
+          label.removeAttribute("style");
+        });
+      });
+
+      routeElements.forEach(routeElement => {
+        routeElement.classList.remove("is-coverage-active");
+        routeElement.removeAttribute("style");
+      });
+
+      delete map.dataset.activeLocation;
+    };
+
+    hotspots.forEach(hotspot => {
+      const location = Array.from(hotspot.classList)
+        .find(className => className.startsWith("coverage-hotspot-"))
+        ?.replace("coverage-hotspot-", "");
+
+      if (!location) return;
+
+      const activateLocation = () => {
+        clearActiveCoverage();
+        map.dataset.activeLocation = location;
+        const activeLocation = map.querySelector(`.coverage-location-${location}`);
+        const activeRoute = map.querySelector(`.coverage-route-brisbane-${location}`);
+
+        activeLocation?.classList.add("is-coverage-active");
+        activeLocation?.querySelector(".coverage-point-halo")?.style.setProperty("stroke", "rgba(254,99,0,.72)");
+        activeLocation?.querySelector(".coverage-point-halo")?.style.setProperty("fill", "rgba(254,99,0,.20)");
+        activeLocation?.querySelector(".coverage-point")?.style.setProperty("fill", "#ff8a3d");
+        activeLocation?.querySelector(".coverage-point")?.style.setProperty("stroke", "#fff");
+        activeLocation?.querySelectorAll("text").forEach(label => {
+          label.style.setProperty("fill", "#fff");
+        });
+
+        activeRoute?.classList.add("is-coverage-active");
+        activeRoute?.style.setProperty("stroke", "rgba(254,99,0,.76)");
+        activeRoute?.style.setProperty("stroke-width", "2.2");
+      };
+
+      const clearLocation = () => {
+        if (map.dataset.activeLocation === location) {
+          clearActiveCoverage();
+        }
+      };
+
+      hotspot.addEventListener("mouseenter", activateLocation);
+      hotspot.addEventListener("focus", activateLocation);
+      hotspot.addEventListener("mouseleave", clearLocation);
+      hotspot.addEventListener("blur", clearLocation);
+    });
+  });
+
+  const businessLogoMarquees = document.querySelectorAll(".business-logo-marquee");
+
+  businessLogoMarquees.forEach(marquee => {
+    const firstSequence = marquee.querySelector(".business-logo-sequence:not([aria-hidden='true'])");
+    const allLogoImages = Array.from(marquee.querySelectorAll(".business-logo-sequence img"));
+    const sourceLogoImages = firstSequence ? Array.from(firstSequence.querySelectorAll("img")) : [];
+    const uniqueLogoImages = Array.from(
+      sourceLogoImages.reduce((logos, image) => {
+        logos.set(image.currentSrc || image.src, image);
+        return logos;
+      }, new Map()).values()
+    );
+
+    if (!uniqueLogoImages.length) {
+      marquee.classList.add("is-ready");
+      return;
+    }
+
+    const markLogoFailed = failedImage => {
+      const failedSource = failedImage.currentSrc || failedImage.src;
+
+      allLogoImages.forEach(image => {
+        if ((image.currentSrc || image.src) === failedSource) {
+          image.classList.add("is-logo-failed");
+        }
+      });
+    };
+
+    const waitForLogo = image => new Promise(resolve => {
+      let isResolved = false;
+
+      const finish = failed => {
+        if (isResolved) return;
+        isResolved = true;
+        image.removeEventListener("load", handleLoad);
+        image.removeEventListener("error", handleError);
+
+        if (failed) {
+          markLogoFailed(image);
+        }
+
+        resolve();
+      };
+
+      const decodeLogo = () => {
+        if (typeof image.decode !== "function") {
+          finish(false);
+          return;
+        }
+
+        image.decode()
+          .then(() => finish(false))
+          .catch(() => finish(!(image.complete && image.naturalWidth > 0)));
+      };
+
+      const handleLoad = () => decodeLogo();
+      const handleError = () => finish(true);
+
+      if (image.complete) {
+        if (image.naturalWidth > 0) {
+          decodeLogo();
+        } else {
+          finish(true);
+        }
+        return;
+      }
+
+      image.addEventListener("load", handleLoad, { once: true });
+      image.addEventListener("error", handleError, { once: true });
+    });
+
+    const markUnreadyLogosFailed = () => {
+      uniqueLogoImages.forEach(image => {
+        if (!(image.complete && image.naturalWidth > 0)) {
+          markLogoFailed(image);
+        }
+      });
+    };
+
+    const readyPromise = Promise.all(uniqueLogoImages.map(waitForLogo));
+    const failsafePromise = new Promise(resolve => {
+      window.setTimeout(() => {
+        markUnreadyLogosFailed();
+        resolve();
+      }, 4500);
+    });
+
+    Promise.race([readyPromise, failsafePromise]).then(() => {
+      marquee.classList.add("is-ready");
+    });
+  });
+
   const navServices = document.querySelectorAll(".nav-services");
 
   if (navServices.length) {
@@ -196,51 +353,6 @@ document.addEventListener("DOMContentLoaded", () => {
           dropdown.removeAttribute("open");
         }
       });
-    });
-  }
-
-  const reviewsMarquee = document.querySelector(".reviews-marquee");
-
-  if (reviewsMarquee) {
-    const reviewsMobileQuery = window.matchMedia("(max-width: 768px)");
-    let reviewsResumeTimer = null;
-
-    const pauseReviewsAutoScroll = () => {
-      if (!reviewsMobileQuery.matches) return;
-
-      reviewsMarquee.classList.add("is-user-interacting");
-      window.clearTimeout(reviewsResumeTimer);
-    };
-
-    const scheduleReviewsAutoScrollResume = () => {
-      if (!reviewsMobileQuery.matches) return;
-
-      window.clearTimeout(reviewsResumeTimer);
-      reviewsResumeTimer = window.setTimeout(() => {
-        reviewsMarquee.classList.remove("is-user-interacting");
-      }, 2000);
-    };
-
-    ["touchstart", "pointerdown"].forEach(eventName => {
-      reviewsMarquee.addEventListener(eventName, pauseReviewsAutoScroll, { passive: true });
-    });
-
-    ["touchend", "touchcancel", "pointerup", "pointercancel"].forEach(eventName => {
-      reviewsMarquee.addEventListener(eventName, scheduleReviewsAutoScrollResume, { passive: true });
-    });
-
-    ["touchmove", "wheel", "scroll"].forEach(eventName => {
-      reviewsMarquee.addEventListener(eventName, () => {
-        pauseReviewsAutoScroll();
-        scheduleReviewsAutoScrollResume();
-      }, { passive: true });
-    });
-
-    reviewsMobileQuery.addEventListener("change", event => {
-      if (!event.matches) {
-        window.clearTimeout(reviewsResumeTimer);
-        reviewsMarquee.classList.remove("is-user-interacting");
-      }
     });
   }
 
@@ -1001,13 +1113,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  const socialProcessJourney = document.querySelector(".social-process-journey");
-
-  if (socialProcessJourney) {
-    const processSteps = Array.from(socialProcessJourney.querySelectorAll(".brand-process-step"));
+  const initialiseProcessJourney = (processJourney, stepSelector, options = {}) => {
+    const processSteps = Array.from(processJourney.querySelectorAll(stepSelector));
 
     if (processSteps.length) {
-      socialProcessJourney.classList.add("is-process-ready");
+      const processMobileQuery = window.matchMedia(options.mobileQuery || "(max-width: 700px)");
+      processJourney.classList.add("is-process-ready");
 
       const activateProcessStep = activeIndex => {
         processSteps.forEach((step, index) => {
@@ -1015,25 +1126,34 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         const progress = processSteps.length > 1 ? (activeIndex / (processSteps.length - 1)) * 100 : 100;
-        socialProcessJourney.style.setProperty("--process-progress", `${progress}%`);
-        socialProcessJourney.style.setProperty("--process-pulse", `${progress}%`);
+        processJourney.style.setProperty("--process-progress", `${progress}%`);
+        processJourney.style.setProperty("--process-pulse", `${progress}%`);
       };
 
       const setActiveProcessStep = () => {
-        const viewportMid = window.innerHeight / 2;
         let activeIndex = 0;
-        let closestDistance = Infinity;
 
-        processSteps.forEach((step, index) => {
-          const rect = step.getBoundingClientRect();
-          const stepMid = rect.top + rect.height / 2;
-          const distance = Math.abs(stepMid - viewportMid);
+        if (options.useSectionProgress && !processMobileQuery.matches) {
+          const rect = processJourney.getBoundingClientRect();
+          const viewportMid = window.innerHeight / 2;
+          const rawProgress = (viewportMid - rect.top) / rect.height;
+          const clampedProgress = Math.max(0, Math.min(rawProgress, 1));
+          activeIndex = Math.round(clampedProgress * (processSteps.length - 1));
+        } else {
+          const viewportMid = window.innerHeight / 2;
+          let closestDistance = Infinity;
 
-          if (distance < closestDistance) {
-            closestDistance = distance;
-            activeIndex = index;
-          }
-        });
+          processSteps.forEach((step, index) => {
+            const rect = step.getBoundingClientRect();
+            const stepMid = rect.top + rect.height / 2;
+            const distance = Math.abs(stepMid - viewportMid);
+
+            if (distance < closestDistance) {
+              closestDistance = distance;
+              activeIndex = index;
+            }
+          });
+        }
 
         activateProcessStep(activeIndex);
       };
@@ -1042,14 +1162,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const processObserver = new IntersectionObserver(entries => {
           entries.forEach(entry => {
             if (entry.isIntersecting) {
-              socialProcessJourney.classList.add("is-process-visible");
+              processJourney.classList.add("is-process-visible");
             }
           });
         }, { threshold: 0.18 });
 
-        processObserver.observe(socialProcessJourney);
+        processObserver.observe(processJourney);
       } else {
-        socialProcessJourney.classList.add("is-process-visible");
+        processJourney.classList.add("is-process-visible");
       }
 
       processSteps.forEach((step, index) => {
@@ -1065,7 +1185,27 @@ document.addEventListener("DOMContentLoaded", () => {
       setActiveProcessStep();
       window.addEventListener("scroll", setActiveProcessStep, { passive: true });
       window.addEventListener("resize", setActiveProcessStep);
+
+      if (processMobileQuery.addEventListener) {
+        processMobileQuery.addEventListener("change", setActiveProcessStep);
+      } else if (processMobileQuery.addListener) {
+        processMobileQuery.addListener(setActiveProcessStep);
+      }
     }
+  };
+
+  const socialProcessJourney = document.querySelector(".social-process-journey");
+
+  if (socialProcessJourney) {
+    initialiseProcessJourney(socialProcessJourney, ".brand-process-step");
+  }
+
+  const businessProcessJourney = document.querySelector(".business-process-section");
+
+  if (businessProcessJourney) {
+    initialiseProcessJourney(businessProcessJourney, ".business-process-step", {
+      useSectionProgress: true
+    });
   }
 
   const socialExamples = document.querySelector("[data-social-examples]");
